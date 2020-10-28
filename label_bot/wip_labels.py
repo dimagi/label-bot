@@ -31,7 +31,10 @@ async def wip(event, gh, config):
 async def run(event, gh, config, **kwargs):
     """Run task."""
 
-    print(f'WIP: {event.full_name}')
+    disabled = 'wip' in config.get('disabled_actions', [])
+    print(f'WIP: {event.full_name} ({"disabled" if disabled else "enabled"})')
+    if disabled:
+        return
 
     try:
         if config.get('error', ''):

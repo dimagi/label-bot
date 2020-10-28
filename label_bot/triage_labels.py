@@ -10,7 +10,10 @@ DEFAULT_REMOVE = []
 async def run(event, gh, config, **kwargs):
     """Run task."""
 
-    print(f'TRIAGE: {event.full_name}')
+    disabled = 'triage' in config.get('disabled_actions', [])
+    print(f'TRIAGE: {event.full_name} ({"disabled" if disabled else "enabled"})')
+    if disabled:
+        return
 
     try:
         if config.get('error', ''):

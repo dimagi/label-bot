@@ -44,7 +44,10 @@ async def review(event, gh, config):
 async def run(event, gh, config, **kwargs):
     """Run the task."""
 
-    print(f'REVIEW: {event.full_name}')
+    disabled = 'review' in config.get('disabled_actions', [])
+    print(f'REVIEW: {event.full_name} ({"disabled" if disabled else "enabled"})')
+    if disabled:
+        return
 
     try:
         if config.get('error', ''):

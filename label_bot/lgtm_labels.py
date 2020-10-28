@@ -6,7 +6,10 @@ import sys
 async def run(event, gh, config):
     """Run the task."""
 
-    print(f'LGTM: {event.full_name}')
+    disabled = 'lgtm' in config.get('disabled_actions', [])
+    print(f'LGTM: {event.full_name} ({"disabled" if disabled else "enabled"})')
+    if disabled:
+        return
 
     try:
         if config.get('error', ''):

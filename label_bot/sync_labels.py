@@ -189,7 +189,10 @@ async def pending(event, gh):
 async def run(event, gh, config, **kwargs):
     """Run task."""
 
-    print(f'SYNC: {event.full_name}')
+    disabled = 'sync' in config.get('disabled_actions', [])
+    print(f'SYNC: {event.full_name} ({"disabled" if disabled else "enabled"})')
+    if disabled:
+        return
 
     try:
         if config.get('error', ''):
