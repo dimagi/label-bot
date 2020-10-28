@@ -32,14 +32,28 @@ Label bot handles a handful of label related scenarios:
 Sure, you'll need to fork it and deploy it on Heroku, or host it somewhere else if desired. There is no publicly
 available bot on the marketplace.
 
-1. Make sure to set the `GH_BOT` environmental variable in your environment. `GH_BOT` should be the name of the
-   GitHub user the bot is operating as.
-2. Also make sure you set `GH_AUTH` variable which is the access token by which the bot user is authenticated.
-   Normally `repo` privileges are sufficient. Learn how to setup an [access token][access] by checking out the
-   documentation.
-3. Optionally, set up `GH_BOT_LINK` which will link to whatever you specify when you click the "details" associated
-   with the status of the CI event.
-4. Setup a webhook in your repository. Point the URL to your running app. Ensure it sends data via JSON. Use a
+### Environment Variables
+
+`GH_BOT`: The name of the GitHub user the bot is operating as.
+
+`GH_AUTH`: The access token by which the bot user is authenticated.
+Normally `repo` privileges are sufficient. Learn how to setup an [access token][access] by checking out the
+documentation.
+
+`GH_SECRET`: High entropy token used when creating the GitHub webhook.
+
+`GH_BOT_LINK`: (optional) Link to use when you click the "details" associated
+with the status of the CI event.
+
+`CHECK_COLLABORATORS`: (optional) If set this will trigger an additional request to the GitHub API to
+determine if the user creating a comment is a contributor. If not set the value from the
+[author_association][author_association] field will be used.
+Only users with 'COLLABORATOR' or 'OWNER' status are allowed to issue commands to the bot.
+
+### Setup
+Assuming you have deployed the bot:
+
+1. Setup a webhook in your repository. Point the URL to your running app. Ensure it sends data via JSON. Use a
    token with high entropy and make sure it is used by your webhook, but also assigned to `GH_SECRET` in your app's
    environmental variables. Lastly, make sure the webhook sends requests for:
 
@@ -48,10 +62,11 @@ available bot on the marketplace.
     - `pull request`: allows the the WIP, review, and pull request auto label task to be sent events.
     - `issue comments`: allows the ability to retrigger tasks via mentions to the bot through issues.
 
-4. If you are using a separate bot account to communicate with your repos, you may have to add the bot as a
+2. If you are using a separate bot account to communicate with your repos, you may have to add the bot as a
    collaborator.
 
 [access]: https://help.github.com/en/github/authenticating-to-github/creating-a-personal-access-token-for-the-command-line
+[author_association]: https://docs.github.com/en/free-pro-team@latest/graphql/reference/enums#commentauthorassociation
 
 ## Which Configuration Gets Used?
 
@@ -79,6 +94,21 @@ When merging the template configuration and the local repo configuration, mergin
 If either the template or local configuration file fails to be acquired, an empty set of options will be returned. Since
 repository label syncing will not occur when the `labels` option is missing, this will prevent all your repository
 labels from getting wiped out in the case of a failure.
+
+## Disabling actions
+Actions may be disabled by placing the action name in the `disabled_actions` config key.
+Available action keys are shown below:
+
+```yml
+disabled_actions:
+  - triage
+  - review
+  - wip
+  - wildcard
+  - lgtm
+  - sync
+```
+
 
 ## Triage Labels
 
