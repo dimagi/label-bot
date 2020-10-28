@@ -7,7 +7,7 @@ import cachetools
 import traceback
 from aiohttp import web
 from aiojobs.aiohttp import setup, spawn, get_scheduler_from_app
-from gidgethub import routing, sansio
+from gidgethub import routing, sansio, BadRequest
 from gidgethub import aiohttp as gh_aiohttp
 from . import wip_labels
 from . import sync_labels
@@ -133,7 +133,15 @@ async def issue_comment_created(event, gh, request, *args, **kwargs):
     # Only allow collaborators or owners to issue commands
     etype = commands.EVENT_MAP[event.event]
     if not event.data[etype]['author_association'] in ('COLLABORATOR', 'OWNER'):
-        return
+        if not os.environ.get('CHECK_COLLABORATORS', False):
+            return
+
+        print("Checking author collaboration status")
+        user = event.data[etype]['user']['login']
+        try:
+            await gh.getitem(event.data["repository"]["collaborators_url"], {'collaborator', user})
+        except BadRequest:
+            return
 
     await spawn(request, deferred_commands(event))
 
