@@ -139,7 +139,7 @@ async def issue_comment_created(event, gh, request, *args, **kwargs):
         print("Checking author collaboration status")
         user = event.data[etype]['user']['login']
         try:
-            await gh.getitem(event.data["repository"]["collaborators_url"], {'collaborator', user})
+            await gh.getitem(event.data["repository"]["collaborators_url"], {'collaborator': user})
         except BadRequest:
             return
 
